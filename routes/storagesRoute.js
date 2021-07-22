@@ -13,7 +13,7 @@ router.get('/getallstorages', async (req, res) => {
 });
 
 router.post('/getstoragebyid', async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const storage = await Storage.findOne({ _id: req.body.storageid });
     res.status(200).json(storage);

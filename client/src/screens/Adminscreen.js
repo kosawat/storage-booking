@@ -50,7 +50,7 @@ export function Bookings() {
         const data = await (
           await axios.get('/api/bookings/getallbookings')
         ).data;
-        console.log(data);
+        // console.log(data);
         setbookings(data.bookings);
       }
 

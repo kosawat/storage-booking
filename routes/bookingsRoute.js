@@ -5,12 +5,78 @@ const { v4: uuidv4 } = require('uuid');
 const Stripe = require('stripe');
 const stripe = Stripe('sk_test_rzAMqflBQzZgmAZOEiJX1Hdy008QVZZV3k');
 
+const formidable = require('formidable');
+const AWS = require('aws-sdk');
+const fs = require('fs');
+
 const Booking = require('../models/booking');
 const Storage = require('../models/storage');
 
+// AWS S3
+const s3 = new AWS.S3({
+  accessKeyId: 'AKIA5BHUWGKMBUWT3Y5R',
+  secretAccessKey: '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',
+  region: 'eu-central-1',
+});
+
+router.post('/uploadimageid', async (req, res) => {
+  const form = new formidable.IncomingForm();
+
+  try {
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        return res.status(400).json({
+          message: 'Image could not be uploaded',
+          errors: err,
+        });
+      }
+      const { image } = files;
+      const { userid } = fields;
+      // console.log(fields);
+
+      if (image.size > 3000000) {
+        return res.status(400).json({
+          message: 'Image should be smaller than 3MB',
+        });
+      }
+
+      // Build unique key by combining user_id and timestamp
+      const imageKey = `${userid}-${Date.now()}`;
+      // console.log(imageKey);
+
+      // upload image to s3
+      const params = {
+        Bucket: 'ai-golf-training-app',
+        Key: `ImageId/${imageKey}`,
+        Body: fs.readFileSync(image.path),
+        ACL: 'public-read',
+        ContentType: `image/jpg`,
+      };
+
+      s3.upload(params, (err, data) => {
+        if (err) {
+          res.status(400).json({ message: 'Upload to s3 failed', errors: err });
+        }
+        // console.log('AWS UPLOAD RES DATA', data);
+        res.status(200).json({ imageUrl: data.Location });
+      });
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error', errors: err });
+  }
+});
+
 router.post('/bookstorage', async (req, res) => {
-  const { storage, userid, fromdate, todate, totalAmount, totalDays, token } =
-    req.body;
+  const {
+    storage,
+    userid,
+    fromdate,
+    todate,
+    totalAmount,
+    totalDays,
+    imageId,
+    token,
+  } = req.body;
 
   const storage_id = storage._id;
   let booking;
@@ -45,6 +111,7 @@ router.post('/bookstorage', async (req, res) => {
         todate: moment(todate).format('DD-MM-YYYY'),
         totalamount: totalAmount,
         transactionid: payment.id,
+        imageid: imageId,
         status: 'booked',
       });
       // console.log(JSON.stringify(newbooking));
@@ -98,7 +165,7 @@ router.post('/cancelbooking', async (req, res) => {
     const temp = bookings.filter(
       (booking) => booking.bookingid.toString() !== bookingid
     );
-    console.log(temp);
+    // console.log(temp);
     storage.currentbookings = temp;
     await storage.save();
 

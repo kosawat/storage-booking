@@ -60,7 +60,7 @@ export const MyBookings = () => {
             userid: user._id,
           })
         ).data;
-        console.log(data);
+        // console.log(data);
         setBookings(data.bookings);
         setLoading(false);
       } catch (error) {
@@ -120,6 +120,13 @@ export const MyBookings = () => {
             <p>
               <b>Total Amount:</b> € {booking.totalamount}
             </p>
+            {booking.imageid && (
+              <p>
+                <a href={booking.imageid} target="_blank" rel="noreferrer">
+                  <b>ID Image</b>
+                </a>
+              </p>
+            )}
             <p>
               <b>Status:</b>{' '}
               {booking.status === 'booked' ? (

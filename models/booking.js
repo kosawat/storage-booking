@@ -34,6 +34,9 @@ const bookingSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    imageid: {
+      type: String,
+    },
     status: {
       type: String,
       required: true,

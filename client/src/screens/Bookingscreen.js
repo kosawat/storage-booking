@@ -12,6 +12,8 @@ function Bookingscreen({ match }) {
   const [error, setError] = useState();
   const [storage, setStorage] = useState();
   const [totalAmount, setTotalAmount] = useState();
+  const [imageId, setImageId] = useState();
+  const [selectedFile, setSelectedFile] = useState();
 
   const storageid = match.params.storageid;
   const fromdate = moment(match.params.fromdate, 'DD-MM-YYYY');
@@ -65,7 +67,7 @@ function Bookingscreen({ match }) {
   // }
 
   async function onToken(token) {
-    console.log(token);
+    // console.log(token);
     const bookingDetails = {
       storage,
       userid: JSON.parse(localStorage.getItem('currentUser'))._id,
@@ -74,6 +76,7 @@ function Bookingscreen({ match }) {
       totalAmount,
       totalDays,
       token,
+      imageId,
     };
     try {
       setLoading(true);
@@ -93,6 +96,39 @@ function Bookingscreen({ match }) {
       Swal.fire('Error', 'Something went wrong', 'error');
     }
   }
+
+  const handleFileInput = (e) => {
+    e.preventDefault();
+    const file = e.target.files[0];
+
+    setSelectedFile(file);
+    
+    // console.log(selectedFile);
+    uploadFile(file);
+  };
+
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append('userid', JSON.parse(localStorage.getItem('currentUser'))._id)
+    formData.append('image', file);
+  
+    try {
+      const response = await axios.post(
+        `/api/bookings/uploadimageid`,
+        formData,
+        {
+          headers: {
+            'content-type': 'multipart/form-data',
+          },
+        }
+      );
+      // console.log(response);
+      setImageId(response.data.imageUrl)
+      return response;
+    } catch (err) {
+      return err.response;
+    }
+  };
 
   return (
     <div className="m-5">
@@ -133,6 +169,17 @@ function Bookingscreen({ match }) {
                   <p>Rent per day: € {storage.rentperday} </p>
                   <p>Total Amount: € {totalAmount}</p>
                 </b>
+              </div>
+              <div
+                style={{
+                  marginTop: '20px',
+                  marginBottom: '20px',
+                  textAlign: 'right',
+                }}
+              >
+                <h1>Please upload your ID</h1>
+                <input type="file" onChange={handleFileInput} />
+                {imageId && <img src={imageId} className="smallimg" alt="" />}
               </div>
               <div style={{ float: 'right' }}>
                 <button

@@ -86,7 +86,7 @@ function Homescreen() {
 
   function filterBySearch() {
     const tempstorages = duplicaterooms.filter((room) =>
-      room.city.toLowerCase().includes(searchkey)
+      room.city.toLowerCase().includes(searchkey.toLowerCase())
     );
     setStorages(tempstorages);
   }

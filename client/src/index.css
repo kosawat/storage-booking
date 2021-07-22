@@ -40,9 +40,16 @@ p{
   width: 100% !important;
   border-radius: 5px !important;
 }
+
 .bigimg {
   height: 350px;
   width: 100% !important;
+  border-radius: 5px !important;
+}
+
+.idimg {
+  height: 200px;
+  width: auto !important;
   border-radius: 5px !important;
 }
 

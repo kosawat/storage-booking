@@ -179,7 +179,7 @@ function Bookingscreen({ match }) {
               >
                 <h1>Please upload your ID</h1>
                 <input type="file" onChange={handleFileInput} />
-                {imageId && <img src={imageId} className="smallimg" alt="" />}
+                {imageId && <img src={imageId} className="idimg" alt="" />}
               </div>
               <div style={{ float: 'right' }}>
                 <button

@@ -16,31 +16,35 @@ function Registerscreen({ history }) {
   const [success, setSuccess] = useState();
 
   async function register() {
-    if (password === cpassword) {
-      const user = {
-        name,
-        email,
-        password,
-        cpassword,
-      };
+    if (password && password.length >= 6) {
+      if (password === cpassword) {
+        const user = {
+          name,
+          email,
+          password,
+          cpassword,
+        };
 
-      try {
-        setLoading(true);
-        const result = await axios.post('/api/users/register', user).data;
-        setLoading(false);
-        setSuccess(true);
-        setName('');
-        setEmail('');
-        setPassword('');
-        setCpassword('');
-        // history.push('/home');
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-        setError(true);
+        try {
+          setLoading(true);
+          const result = await axios.post('/api/users/register', user).data;
+          setLoading(false);
+          setSuccess(true);
+          setName('');
+          setEmail('');
+          setPassword('');
+          setCpassword('');
+          // history.push('/home');
+        } catch (error) {
+          console.log(error);
+          setLoading(false);
+          setError(true);
+        }
+      } else {
+        alert('Passwords not matched!');
       }
     } else {
-      alert('Passwords not matched!');
+      alert('Password must be at least 6 characters!');
     }
   }
 
@@ -74,6 +78,7 @@ function Registerscreen({ history }) {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              min={6}
             />
             <input
               type="password"
